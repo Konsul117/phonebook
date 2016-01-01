@@ -35,7 +35,6 @@ class AddressController extends Controller {
 	public function actionCities() {
 		Yii::$app->response->format = Response::FORMAT_JSON;
 
-		//@TODO: добавить проверку результата запроса и указание result, error у responce
 		$query = Yii::$app->request->post('query');
 
 		$this->ajaxResponse->success = true;

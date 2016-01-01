@@ -29,7 +29,7 @@ PhoneAsset::register($this);
     <div class="wrap">
         <?php
             NavBar::begin([
-                'brandLabel' => 'My Company',
+                'brandLabel' => 'Телефонный справочник',
                 'brandUrl' => Yii::$app->homeUrl,
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
@@ -37,14 +37,14 @@ PhoneAsset::register($this);
             ]);
 			
 			$nav_items = [
-                    ['label' => 'Contact', 'url' => ['/contact/index']],
+                    ['label' => 'Контакты', 'url' => ['/']],
                 ];
 			
 			if(Yii::$app->user->isGuest) {
-				$nav_items[] = ['label' => 'Login', 'url' => ['/user/login']];
-				$nav_items[] = ['label' => 'Register', 'url' => ['/user/register']];
+				$nav_items[] = ['label' => 'Войти', 'url' => ['/user/login']];
+				$nav_items[] = ['label' => 'Регистрация', 'url' => ['/user/register']];
 			} else {
-				$nav_items[] = ['label' => 'Logout (' . Yii::$app->user->identity->username . ')',
+				$nav_items[] = ['label' => 'Выйти (' . Yii::$app->user->identity->username . ')',
                             'url' => ['/user/logout'],
                             'linkOptions' => ['data-method' => 'post']];
 			}

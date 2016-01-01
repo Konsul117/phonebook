@@ -4,7 +4,6 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
-use app\models\User;
 
 /**
  * LoginForm is the model behind the login form.
@@ -30,6 +29,16 @@ class LoginForm extends Model
         ];
     }
 
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels() {
+		return [
+			'username' => 'Имя',
+			'password' => 'Пароль',
+		];
+	}
+
     /**
      * Validates the password.
      * This method serves as the inline validation for password.
@@ -37,13 +46,13 @@ class LoginForm extends Model
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params)
+    public function validatePassword($attribute)
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+                $this->addError($attribute, 'Некорректные имя пользователя или пароль.');
             }
         }
     }

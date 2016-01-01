@@ -30,10 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 	if (Yii::$app->authManager->getAssignment(AclHelper::ROLE_ADMIN, \Yii::$app->user->id) !== null) {
 		$attributes = [
-				[
-						'attribute' => 'id',
-						'label'     => '№',
-				],
+				'id',
 				'authorName',
 				'name',
 				'surname',
@@ -62,10 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	}
 	else {
 		$attributes = [
-				[
-						'attribute' => 'id',
-						'label'     => '№',
-				],
+				'id',
 				'name',
 				'surname',
 				[

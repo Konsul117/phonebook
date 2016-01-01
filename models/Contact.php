@@ -69,6 +69,7 @@ class Contact extends \yii\db\ActiveRecord {
 	 */
 	public function attributeLabels() {
 		return [
+			'id'           => 'Номер записи',
 			'authorName'   => 'Владелец',
 			'name'         => 'Имя',
 			'surname'      => 'Фамилия',

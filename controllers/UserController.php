@@ -9,7 +9,7 @@ use app\models\LoginForm;
 use app\models\RegisterForm;
 
 class UserController extends \yii\web\Controller {
-	
+
 	public function behaviors() {
 		return [
 			'access' => [
@@ -37,6 +37,7 @@ class UserController extends \yii\web\Controller {
 	}
 
 	public function actionLogin() {
+		$this->view->title = 'Вход';
 		if (!\Yii::$app->user->isGuest) {
 			return $this->goHome();
 		}
@@ -53,6 +54,7 @@ class UserController extends \yii\web\Controller {
 	}
 	
 	public function actionRegister() {
+		$this->view->title = 'Регистрация';
 		if (!\Yii::$app->user->isGuest) {
 			return $this->goHome();
 		}
