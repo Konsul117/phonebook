@@ -5,25 +5,65 @@ namespace app\models;
 use app\components\AclHelper;
 use Yii;
 use yii\base\Model;
-use app\models\User;
 
+/**
+ * Модель формы регистрации пользователя
+ */
 class RegisterForm extends Model {
-	
+
+	/**
+	 * Имя пользователя
+	 * @var string
+	 */
 	public $username;
+
+	/**
+	 * Пароль
+	 * @var string
+	 */
 	public $password;
-	public $password_repeat;
+
+	/**
+	 * Подтверждение пароля
+	 * @var string
+	 */
+	public $passwordRepeat;
+
+	/**
+	 * E-mail
+	 * @var string
+	 */
 	public $email;
 
+	/**
+	 * @inheritdoc
+	 */
 	public function rules() {
 		return [
-			[['username', 'password', 'password_repeat', 'email'], 'required'],
+			[['username', 'password', 'passwordRepeat', 'email'], 'required'],
 			[['email', 'username'], 'unique', 'targetClass' => User::className()],
-			['password', 'compare'],
+			['password', 'compare', 'compareAttribute' => 'passwordRepeat', 'message' => 'Пароль и подтверждение должны совпадать'],
 			['email', 'email'],
 			[['username', 'password'], 'required'],
 		];
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels() {
+		return [
+			'username'       => 'Имя пользователя',
+			'password'       => 'Пароль',
+			'passwordRepeat' => 'Подтверждение пароля',
+			'email'          => 'E-mail',
+		];
+	}
+
+	/**
+	 * Регистрация пользователя
+	 * @return User|bool
+	 */
 	public function register() {
 		if ($this->validate()) {
 			$user = new User();

@@ -5,11 +5,13 @@ namespace app\models;
 use app\components\TimestampUTCBehavior;
 use app\events\UserEvent;
 use Yii;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
- * Модель пользователей
+ * Модель пользователя
  *
  * @property string $id               Уникальный идентификатор пользователя
  * @property string $username         Имя (логин) пользователя
@@ -24,8 +26,16 @@ class User extends ActiveRecord implements IdentityInterface {
 	/** @var string Событие удаления пользователя */
 	const EVENT_USER_DELETE = 'eventUserDelete';
 
-	public $password_repeat;
+	/**
+	 * Подтверждение пароля
+	 *
+	 * @var string
+	 */
+	public $passwordRepeat;
 
+	/**
+	 * @inheritdoc
+	 */
 	public function rules() {
 		return [
 			[['username', 'password', 'email'], 'required'],
@@ -39,10 +49,24 @@ class User extends ActiveRecord implements IdentityInterface {
 	public function behaviors() {
 		return [
 			[
-				'class'				 => TimestampUTCBehavior::className(),
+				'class'              => TimestampUTCBehavior::className(),
 				'createdAtAttribute' => 'create_stamp',
 				'updatedAtAttribute' => 'update_stamp',
 			],
+		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function attributeLabels() {
+		return [
+			'username'       => 'Имя пользователя',
+			'password'       => 'Пароль',
+			'passwordRepeat' => 'Подтверждение пароля',
+			'email'          => 'E-mail',
+			'create_stamp'   => 'Создано',
+			'update_stamp'   => 'Обновлено',
 		];
 	}
 
@@ -58,11 +82,11 @@ class User extends ActiveRecord implements IdentityInterface {
 	 */
 	public static function findIdentityByAccessToken($token, $type = null) {
 		//@TODO: реализовать идентификацию по токену
-//		foreach (self::$users as $user) {
-//			if ($user['accessToken'] === $token) {
-//				return new static($user);
-//			}
-//		}
+		//		foreach (self::$users as $user) {
+		//			if ($user['accessToken'] === $token) {
+		//				return new static($user);
+		//			}
+		//		}
 
 		return null;
 	}
@@ -92,24 +116,37 @@ class User extends ActiveRecord implements IdentityInterface {
 		return $this->auth_key === $authKey;
 	}
 
+	/**
+	 * Генерация ключа авторизации
+	 */
 	public function generateAuthKey() {
 		$this->auth_key = Yii::$app->security->generateRandomString();
 	}
 
 	/**
-	 * Validates password
+	 * Валидация пароля
 	 *
-	 * @param  string  $password password to validate
-	 * @return boolean if password provided is valid for current user
+	 * @param  string $password пароль для валидации
+	 * @return boolean
 	 */
 	public function validatePassword($password) {
 		return Yii::$app->security->validatePassword($password, $this->password);
 	}
 
+	/**
+	 * Установка пароля
+	 *
+	 * @param string $password пароль
+	 * @throws Exception
+	 * @throws InvalidConfigException
+	 */
 	public function setPassword($password) {
 		$this->password = Yii::$app->security->generatePasswordHash($password);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function beforeDelete() {
 		if (parent::beforeDelete()) {
 
