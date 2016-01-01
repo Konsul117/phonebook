@@ -2,7 +2,10 @@
 
 namespace app\models;
 
+use app\components\PhoneNumberHelper;
 use app\components\TimestampUTCBehavior;
+use app\components\validators\GuidValidator;
+use app\components\validators\PhoneValidator;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\db\ActiveQuery;
@@ -10,15 +13,15 @@ use yii\db\ActiveQuery;
 /**
  * This is the model class for table "contact".
  *
- * @property integer     $id            Уникальный идентификатор контакта
- * @property integer     $author_id     Автор
- * @property string      $name          Имя
- * @property string      $surname       Фамилия
- * @property string      $phone         Телефон
- * @property string      $city_guid     Guid города по ФИАС
- * @property string      $street_guid   Guid улицы по ФИАС
- * @property integer     $created_at    Дата-время создания записи
- * @property integer     $updated_at    Дата-время обновления записи
+ * @property integer $id              Уникальный идентификатор контакта
+ * @property integer $author_id       Автор
+ * @property string  $name            Имя
+ * @property string  $surname         Фамилия
+ * @property string  $phone           Телефон
+ * @property string  $city_guid       Guid города по ФИАС
+ * @property string  $street_guid     Guid улицы по ФИАС
+ * @property integer $create_stamp    Дата-время создания записи
+ * @property integer $update_stamp    Дата-время обновления записи
  *
  * @property User        $author
  * @property string      $authorName
@@ -50,13 +53,14 @@ class Contact extends \yii\db\ActiveRecord {
 			[['author_id'], 'integer'],
 			[['name', 'surname'], 'string', 'max' => 100, 'message' => 'Длина не более 100 символов'],
 			[['name', 'phone'], 'required', 'message' => 'Поле не заполнено'],
-			['phone', 'match', 'pattern' => '/^\+7\s\([0-9]{3}\)\s[0-9]{3}\-[0-9]{4}$/', 'message' => 'Телефон должен быть в формате +7 (xxx) xxx-xxxx'],
+			['phone', PhoneValidator::class],
+			[['city_guid', 'street_guid'], GuidValidator::class],
 		];
 	}
 
 	public function scenarios() {
 		return [
-			static::SCENARIO_ADD_CONTACT => ['name', 'surname', 'phone', 'city_guid', 'street_guid'],
+			static::SCENARIO_ADD_CONTACT => ['name', 'surname', 'phoneFront', 'city_guid', 'street_guid'],
 		];
 	}
 
@@ -65,14 +69,15 @@ class Contact extends \yii\db\ActiveRecord {
 	 */
 	public function attributeLabels() {
 		return [
-			'author_id'   => 'Владелец',
-			'name'        => 'Имя',
-			'surname'     => 'Фамилия',
-			'phone'       => 'Телефон',
-			'cityTitle'   => 'Город',
-			'streetTitle' => 'Улица',
-			'created'     => 'Создано',
-			'updated'     => 'Обновлено',
+			'authorName'   => 'Владелец',
+			'name'         => 'Имя',
+			'surname'      => 'Фамилия',
+			'phone'        => 'Телефон',
+			'phoneFront'   => 'Телефон',
+			'cityTitle'    => 'Город',
+			'streetTitle'  => 'Улица',
+			'create_stamp' => 'Создано',
+			'update_stamp' => 'Обновлено',
 		];
 	}
 
@@ -94,21 +99,34 @@ class Contact extends \yii\db\ActiveRecord {
 		];
 	}
 
+	/**
+	 * Автор записи
+	 * @return ActiveQuery
+	 */
 	public function getAuthor() {
 		return $this->hasOne(User::class, ['id' => 'author_id']);
 	}
 
+	/**
+	 * Имя автора записи
+	 * @return string
+	 */
 	public function getAuthorName() {
 		return $this->author->username;
 	}
 
 	/**
+	 * Город
 	 * @return ActiveQuery
 	 */
 	public function getCity() {
 		return $this->hasOne(FiasAddrobj::class, ['aoguid' => 'city_guid']);
 	}
 
+	/**
+	 * Название города
+	 * @return string
+	 */
 	public function getCityTitle() {
 		$cityModel = $this->city;
 
@@ -119,10 +137,18 @@ class Contact extends \yii\db\ActiveRecord {
 		return '';
 	}
 
+	/**
+	 * Улица
+	 * @return ActiveQuery
+	 */
 	public function getStreet() {
 		return $this->hasOne(FiasAddrobj::class, ['aoguid' => 'street_guid']);
 	}
 
+	/**
+	 * Название улицы
+	 * @return string
+	 */
 	public function getStreetTitle() {
 		$streetModel = $this->street;
 
@@ -131,6 +157,24 @@ class Contact extends \yii\db\ActiveRecord {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Установка значения номера телефона для фронэнда
+	 * Метод нужен для работы с формой
+	 * @param $phone
+	 */
+	public function setPhoneFront($phone) {
+		$this->phone = PhoneNumberHelper::stripPhoneNumber($phone);
+	}
+
+	/**
+	 * Получение номера телефона для фронтэнда
+	 * Метод нужен для работы с формой
+	 * @return string
+	 */
+	public function getPhoneFront() {
+		return PhoneNumberHelper::formatPhoneFrontend($this->phone);
 	}
 
 }

@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'surname')->textInput(['maxlength' => 100])->label('Фамилия') ?>
 
-    <?= $form->field($model, 'phone')->textInput(['maxlength' => 45, 'class' => 'form-control phone_field'])->label('Телефон') ?>
+    <?= $form->field($model, 'phoneFront')->textInput(['maxlength' => 45, 'class' => 'form-control phone_field']) ?>
 
     <?= $form->field($model, 'cityTitle')->textInput(['maxlength' => 100, 'data-role' => 'city_selector', 'autocomplete'=>'off']) ?>
 

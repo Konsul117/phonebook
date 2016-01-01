@@ -34,23 +34,30 @@ $this->params['breadcrumbs'][] = $this->title;
 						'attribute' => 'id',
 						'label'     => '№',
 				],
-				[
-						'attribute' => 'author_id',
-						'value'     => (($model->author !== null) ? $model->author->username : ''),
-				],
+				'authorName',
 				'name',
 				'surname',
-				'phone',
 				[
-						'attribute' => 'city_guid',
+						'class'     => 'yii\grid\DataColumn',
+						'attribute' => 'phone',
+						'format'    => 'phoneVisual',
+				],
+				[
+						'attribute' => 'cityTitle',
 						'value'     => (($model->city !== null) ? $model->city->formalname : ''),
 				],
 				[
-						'attribute' => 'street_guid',
+						'attribute' => 'streetTitle',
 						'value'     => (($model->street !== null) ? $model->street->formalname : ''),
 				],
-				'create_stamp',
-				'update_stamp',
+				[
+						'attribute' => 'create_stamp',
+						'format'    => 'localDate',
+				],
+				[
+						'attribute' => 'update_stamp',
+						'format'    => 'localDate',
+				],
 		];
 	}
 	else {
@@ -61,23 +68,37 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 				'name',
 				'surname',
-				'phone',
 				[
-						'attribute' => 'city_guid',
+						'class'     => 'yii\grid\DataColumn',
+						'attribute' => 'phone',
+						'format'    => 'phoneVisual',
+				],
+				[
+						'attribute' => 'cityTitle',
 						'value'     => (($model->city !== null) ? $model->city->formalname : ''),
 				],
 				[
-						'attribute' => 'street_guid',
+						'attribute' => 'streetTitle',
 						'value'     => (($model->street !== null) ? $model->street->formalname : ''),
 				],
-				'create_stamp',
-				'update_stamp',
+				[
+						'attribute' => 'create_stamp',
+						'format'    => 'localDate',
+				],
+				[
+						'attribute' => 'update_stamp',
+						'format'    => 'localDate',
+				],
 		];
 	} ?>
 
 	<?= DetailView::widget([
 			'model'      => $model,
 			'attributes' => $attributes,
+			'formatter'      => [
+					'class'      => app\components\Formatter::class,
+					'dateFormat' => 'd.m.Y H:i',
+			],
 	]) ?>
 
 </div>

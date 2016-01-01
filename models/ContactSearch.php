@@ -6,7 +6,6 @@ use app\components\AclHelper;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Contact;
 
 /**
  * ContactSearch represents the model behind the search form about `app\models\Contact`.
@@ -20,7 +19,7 @@ class ContactSearch extends Contact
     {
         return [
             [['id', 'author_id'], 'integer'],
-            [['name', 'surname', 'phone', 'address', 'username'], 'safe'],
+            [['name', 'surname', 'phone', 'username'], 'safe'],
         ];
     }
 
@@ -64,15 +63,14 @@ class ContactSearch extends Contact
         $query->andFilterWhere([
 			'id'		 => $this->id,
 //			'user_id'	 => Yii::$app->get('user', false)->id,
-			'created'	 => $this->created,
-			'updated'	 => $this->updated,
+			'create_stamp'	 => $this->create_stamp,
+			'update_stamp'	 => $this->update_stamp,
 		]);
 
 		$query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'surname', $this->surname])
             ->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'phone', $this->phone])
-            ->andFilterWhere(['like', 'address', $this->address]);
+            ->andFilterWhere(['like', 'phone', $this->phone]);
 		
         return $dataProvider;
     }
