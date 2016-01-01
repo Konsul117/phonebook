@@ -2,15 +2,15 @@
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\helpers\Url;
+use yii\web\View;
 use yii\widgets\Breadcrumbs;
-//use app\assets\AppAsset;
-use app\assets\MyAsset;
+use app\assets\PhoneAsset;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-//AppAsset::register($this);
-MyAsset::register($this);
+PhoneAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -23,6 +23,7 @@ MyAsset::register($this);
     <?php $this->head() ?>
 </head>
 <body>
+<?php $this->registerJs('var baseUrl = "' . Url::to(['/']) . '";', View::POS_BEGIN) ?>
 
 <?php $this->beginBody() ?>
     <div class="wrap">

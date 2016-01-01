@@ -13,10 +13,11 @@ class m151223_114802_create_contact extends Migration {
 			'author_id'    => Schema::TYPE_INTEGER . ' NOT NULL COMMENT "Автор"',
 			'name'         => Schema::TYPE_STRING . ' NOT NULL COMMENT "Имя"',
 			'surname'      => Schema::TYPE_STRING . ' NOT NULL COMMENT "Фамилия"',
-			'phone'        => Schema::TYPE_STRING . '(15) NOT NULL COMMENT "Телефон"',
-			'address'      => Schema::TYPE_STRING . ' NOT NULL COMMENT "Адрес"',
-			'create_stamp' => Schema::TYPE_DATETIME . ' NOT NULL COMMENT "Дата-врем создания записи"',
-			'update_stamp' => Schema::TYPE_DATETIME . ' NOT NULL COMMENT "Дата-врем обновления записи"',
+			'phone'        => Schema::TYPE_STRING . '(20) NOT NULL COMMENT "Телефон"',
+			'city_guid'    => Schema::TYPE_STRING . ' NOT NULL COMMENT "Guid города по ФИАС"',
+			'street_guid'  => Schema::TYPE_STRING . ' NOT NULL COMMENT "Guid улицы по ФИАС"',
+			'create_stamp' => Schema::TYPE_DATETIME . ' NOT NULL COMMENT "Дата-время создания записи"',
+			'update_stamp' => Schema::TYPE_DATETIME . ' NOT NULL COMMENT "Дата-время обновления записи"',
 		], 'COMMENT "Контакты"');
 
 		$this->createIndex('ix-' . $this->tableName . '[author_id]', $this->tableName, ['author_id']);

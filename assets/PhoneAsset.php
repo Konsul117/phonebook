@@ -3,21 +3,22 @@
 namespace app\assets;
 
 use yii\web\AssetBundle;
+use yii\web\JqueryAsset;
 
-class MyAsset extends AssetBundle {
+class PhoneAsset extends AssetBundle {
 	
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/my.css',
-        'css/my2.css',
+        'css/phone.css',
     ];
     public $js = [
-		'js/my.js',
+		'js/base_init.js',
+		'js/contact_form.js',
 		'js/jquery.maskedinput.min.js',
     ];
     public $depends = [
-//        'yii\web\YiiAsset',
-//        'yii\bootstrap\BootstrapAsset',
+	    JqueryAsset::class,
+	    JqeryUiAsset::class,
     ];
 }

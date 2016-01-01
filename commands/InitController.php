@@ -166,7 +166,7 @@ class InitController extends Controller {
 		}
 
 		if ($user->save()) {
-			$this->stdout('Пользователь добавле' . PHP_EOL, Console::FG_GREEN);
+			$this->stdout('Пользователь добавлен' . PHP_EOL, Console::FG_GREEN);
 			/** @var ManagerInterface $auth */
 			$auth = Yii::$app->authManager;
 			$authorRole = $auth->getRole(AclHelper::ROLE_ADMIN);

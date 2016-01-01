@@ -3,9 +3,9 @@
 namespace app\models;
 
 use app\components\TimestampUTCBehavior;
+use app\events\UserEvent;
 use Yii;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 
 /**
@@ -20,6 +20,9 @@ use yii\web\IdentityInterface;
  * @property string $update_stamp     Дата-врем обновления записи
  */
 class User extends ActiveRecord implements IdentityInterface {
+
+	/** @var string Событие удаления пользователя */
+	const EVENT_USER_DELETE = 'eventUserDelete';
 
 	public $password_repeat;
 
@@ -54,11 +57,12 @@ class User extends ActiveRecord implements IdentityInterface {
 	 * @inheritdoc
 	 */
 	public static function findIdentityByAccessToken($token, $type = null) {
-		foreach (self::$users as $user) {
-			if ($user['accessToken'] === $token) {
-				return new static($user);
-			}
-		}
+		//@TODO: реализовать идентификацию по токену
+//		foreach (self::$users as $user) {
+//			if ($user['accessToken'] === $token) {
+//				return new static($user);
+//			}
+//		}
 
 		return null;
 	}
@@ -104,6 +108,19 @@ class User extends ActiveRecord implements IdentityInterface {
 
 	public function setPassword($password) {
 		$this->password = Yii::$app->security->generatePasswordHash($password);
+	}
+
+	public function beforeDelete() {
+		if (parent::beforeDelete()) {
+
+			//при удалении пользователя вызываем событие
+
+			$this->trigger(static::EVENT_USER_DELETE, (new UserEvent(['user' => $this])));
+
+			return true;
+		}
+
+		return false;
 	}
 
 }

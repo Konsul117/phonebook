@@ -16,11 +16,12 @@ class User extends \yii\web\User implements \yii\web\IdentityInterface {
 	 * @inheritdoc
 	 */
 	public static function findIdentityByAccessToken($token, $type = null) {
-		foreach (self::$users as $user) {
-			if ($user['accessToken'] === $token) {
-				return new UserModel($user);
-			}
-		}
+		//@TODO: сделать идентификацию по токену
+//		foreach (self::$users as $user) {
+//			if ($user['accessToken'] === $token) {
+//				return new UserModel($user);
+//			}
+//		}
 
 		return null;
 	}

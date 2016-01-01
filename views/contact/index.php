@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][]	 = $this->title;
 			'name',
 			'surname',
 			'phone',
-			'address',
+//			'address',
 			[
 				'class'		 => DataColumn::class,
 				'attribute'	 => 'create_stamp',
@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][]	 = $this->title;
 			'name',
 			'surname',
 			'phone',
-			'address',
+//			'address',
 			[
 				'class'		 => 'yii\grid\DataColumn',
 				'attribute'	 => 'create_stamp',

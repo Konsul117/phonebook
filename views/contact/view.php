@@ -27,16 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
 	</p>
 
 	<?php
-	$attributes = [
-			'id',
-			'authorName',
-			'name',
-			'surname',
-			'phone',
-			'address',
-			'create_stamp',
-			'update_stamp',
-	];
 
 	if (Yii::$app->authManager->getAssignment(AclHelper::ROLE_ADMIN, \Yii::$app->user->id) !== null) {
 		$attributes = [
@@ -44,11 +34,21 @@ $this->params['breadcrumbs'][] = $this->title;
 						'attribute' => 'id',
 						'label'     => '№',
 				],
-				'authorName',
+				[
+						'attribute' => 'author_id',
+						'value'     => (($model->author !== null) ? $model->author->username : ''),
+				],
 				'name',
 				'surname',
 				'phone',
-				'address',
+				[
+						'attribute' => 'city_guid',
+						'value'     => (($model->city !== null) ? $model->city->formalname : ''),
+				],
+				[
+						'attribute' => 'street_guid',
+						'value'     => (($model->street !== null) ? $model->street->formalname : ''),
+				],
 				'create_stamp',
 				'update_stamp',
 		];
@@ -62,7 +62,14 @@ $this->params['breadcrumbs'][] = $this->title;
 				'name',
 				'surname',
 				'phone',
-				'address',
+				[
+						'attribute' => 'city_guid',
+						'value'     => (($model->city !== null) ? $model->city->formalname : ''),
+				],
+				[
+						'attribute' => 'street_guid',
+						'value'     => (($model->street !== null) ? $model->street->formalname : ''),
+				],
 				'create_stamp',
 				'update_stamp',
 		];

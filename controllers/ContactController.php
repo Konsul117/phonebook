@@ -9,7 +9,6 @@ use app\models\ContactSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\filters\auth\HttpBasicAuth;
 use yii\filters\AccessControl;
 
 /**
@@ -94,6 +93,8 @@ class ContactController extends Controller {
 			throw new NotFoundHttpException('You havent access to create item.');
 		}
 
+		$model->setScenario(Contact::SCENARIO_ADD_CONTACT);
+
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
 		} else {
@@ -108,6 +109,7 @@ class ContactController extends Controller {
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id
 	 * @return mixed
+	 * @throws NotFoundHttpException
 	 */
 	public function actionUpdate($id) {
 		$model = $this->findModel($id);
@@ -115,6 +117,8 @@ class ContactController extends Controller {
 		if (!\Yii::$app->user->can('updatePost', ['post' => $model])) {
 			throw new NotFoundHttpException('You havent access to edit this item.');
 		}
+
+		$model->setScenario(Contact::SCENARIO_ADD_CONTACT);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
 			return $this->redirect(['view', 'id' => $model->id]);
@@ -130,6 +134,7 @@ class ContactController extends Controller {
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
 	 * @param integer $id
 	 * @return mixed
+	 * @throws NotFoundHttpException
 	 */
 	public function actionDelete($id) {
 		$model = $this->findModel($id);
