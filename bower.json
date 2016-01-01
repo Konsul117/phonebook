@@ -1,0 +1,23 @@
+{
+  "name": "phonebook",
+  "homepage": "https://github.com/Konsul117/phonebook",
+  "authors": [
+    "Konsul117 <konsul117@bk.ru>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor/bower",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "install": "~1.0.4",
+    "jquery-ui": "~1.11.4"
+  }
+}
