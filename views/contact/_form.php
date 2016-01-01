@@ -23,8 +23,6 @@ use yii\widgets\ActiveForm;
 
 	<?= $form->field($model, 'city_guid')->hiddenInput(['id' => 'cityGuid'])->label(false) ?>
 
-    <?//= $form->field($model->street, 'formalname')->textInput(['maxlength' => 100, 'data-role' => 'street_selector']) ?>
-
     <?= $form->field($model, 'street_guid')->hiddenInput(['id' => 'streetGuid'])->label(false) ?>
 
     <?= $form->field($model, 'streetTitle')->textInput(['maxlength' => 100, 'data-role' => 'street_selector', 'autocomplete'=>'off']) ?>

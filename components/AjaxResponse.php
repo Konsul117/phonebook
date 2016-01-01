@@ -20,7 +20,7 @@ class AjaxResponse {
 	 * Ошибки
 	 * @var string[]
 	 */
-	public $errors;
+	public $errors = [];
 
 	/**
 	 * Html-контент

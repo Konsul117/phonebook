@@ -25,6 +25,8 @@
 						return;
 					}
 
+					$cityField.inputIndicator('start');
+
 					$.ajax({
 						url:     baseUrl+'address/cities',
 						method:  'post',
@@ -35,8 +37,12 @@
 								result.push({'id':el.id,'label':el.title, 'value':el.title});
 							});
 							response(result);
+
+							$cityField.inputIndicator('stop');
 						},
 						error:   function() {
+							$cityField.inputIndicator('stop');
+
 							alert('Произошла внутренняя ошибка');
 						}
 					});
@@ -58,18 +64,38 @@
 						return;
 					}
 
+					$streetField.inputIndicator('start');
+
 					$.ajax({
 						url:     baseUrl+'address/streets',
 						method:  'post',
 						data:    {query: text, cityGuid: $('input#cityGuid', $form).val()},
-						success: function(data) {
+						success: function(ajaxResult) {
 							var result = [];
-							$(data.data).each(function(id,el) {
-								result.push({'id':el.id,'label':el.title, 'value':el.title});
-							});
+
+							var $streetHelpBlock = $streetField.siblings('.help-block').text('');
+
+							if (ajaxResult.success === true) {
+								$(ajaxResult.data).each(function(id,el) {
+									result.push({'id':el.id,'label':el.title, 'value':el.title});
+								});
+							}
+							else {
+								if (ajaxResult.errors.length > 0) {
+									$streetHelpBlock.text(ajaxResult.errors[0]);
+								}
+								else {
+									$streetHelpBlock.text('Улицы не найдены');
+								}
+							}
+
 							response(result);
+
+							$streetField.inputIndicator('stop');
 						},
 						error:   function() {
+							$streetField.inputIndicator('stop');
+
 							alert('Произошла внутренняя ошибка');
 						}
 					});

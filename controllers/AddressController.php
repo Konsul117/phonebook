@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\AjaxResponse;
+use app\components\validators\GuidValidator;
 use app\models\FiasAddrobj;
 use Yii;
 use yii\web\Controller;
@@ -32,9 +33,13 @@ class AddressController extends Controller {
 	}
 
 	public function actionCities() {
+		Yii::$app->response->format = Response::FORMAT_JSON;
+
 		//@TODO: добавить проверку результата запроса и указание result, error у responce
 		$query = Yii::$app->request->post('query');
-		Yii::$app->response->format = Response::FORMAT_JSON;
+
+		$this->ajaxResponse->success = true;
+
 		$citiesCommand = FiasAddrobj::find()
 			->select([FiasAddrobj::tableName() . '.aoguid AS id', FiasAddrobj::tableName() . '.formalname AS title'])
 			->where([
@@ -42,21 +47,41 @@ class AddressController extends Controller {
 					FiasAddrobj::tableName() . '.actstatus' => 1
 			])
 			->andWhere(FiasAddrobj::tableName() . '.formalname LIKE :query')
+			->limit(10)
+			->orderBy(['formalname' => SORT_ASC])
 			->createCommand()
 			->bindValues([
 				':query' => $query . '%',
 			]);
-		$this->ajaxResponse->data = $citiesCommand->queryAll();
+
+		$data = $citiesCommand->queryAll();
+
+		if (!empty($data)) {
+			$this->ajaxResponse->data = $data;
+		}
+		else {
+			$this->ajaxResponse->errors[] = 'Города не найдены';
+			$this->ajaxResponse->success = false;
+		}
 
 		return ;
 	}
 
 	public function actionStreets() {
-		//@TODO: добавить проверку guid-а города
-		$cityGuid = Yii::$app->request->post('cityGuid');
-		$query = Yii::$app->request->post('query');
 		Yii::$app->response->format = Response::FORMAT_JSON;
-		$citiesCommand = FiasAddrobj::find()
+
+		$cityGuid = Yii::$app->request->post('cityGuid');
+		if ((new GuidValidator())->validate($cityGuid) === false) {
+			$this->ajaxResponse->success = false;
+			$this->ajaxResponse->errors[] = 'Не выбран город';
+
+			return ;
+		}
+
+		$this->ajaxResponse->success = true;
+
+		$query = Yii::$app->request->post('query');
+		$streetsCommand = FiasAddrobj::find()
 			->select([FiasAddrobj::tableName() . '.aoguid AS id', FiasAddrobj::tableName() . '.formalname AS title'])
 			->where([
 				FiasAddrobj::tableName() . '.' . 'aolevel' => FiasAddrobj::AOLEVEL_STREET,
@@ -64,13 +89,23 @@ class AddressController extends Controller {
 			])
 			->andWhere(FiasAddrobj::tableName() . '.parentguid = :city_guid')
 			->andWhere(FiasAddrobj::tableName() . '.formalname LIKE :query')
+			->limit(10)
+			->orderBy(['formalname' => SORT_ASC])
 			->createCommand()
 			->bindValues([
 				':city_guid' => $cityGuid,
 				':query' => $query . '%',
 			]);
 
-		$this->ajaxResponse->data = $citiesCommand->queryAll();
+		$data = $streetsCommand->queryAll();
+
+		if (!empty($data)) {
+			$this->ajaxResponse->data = $data;
+		}
+		else {
+			$this->ajaxResponse->errors[] = 'Улицы не найдены';
+			$this->ajaxResponse->success = false;
+		}
 
 		return ;
 	}

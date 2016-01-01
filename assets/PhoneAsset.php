@@ -15,6 +15,7 @@ class PhoneAsset extends AssetBundle {
     public $js = [
 		'js/base_init.js',
 		'js/contact_form.js',
+		'js/input_indicator.js',
 		'js/jquery.maskedinput.min.js',
     ];
     public $depends = [

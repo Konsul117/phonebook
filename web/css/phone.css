@@ -1,3 +1,50 @@
-.css1 {
-    float: left;
+.contact-form .form-group {
+	position: relative;
+}
+
+.contact-form .form-group .loading-indicator {
+	position: absolute;
+	right: 10px;
+	top: 30px;
+}
+
+.glyphicon-refresh-animate {
+	position:       absolute;
+	vertical-align: middle;
+	top:            30%;
+	left:           2%;
+	-o-animation-name: glyphicon-refresh-animate;
+	-moz-animation-name: glyphicon-refresh-animate;
+	-webkit-animation-name: glyphicon-refresh-animate;
+	animation-name: glyphicon-refresh-animate;
+
+	-o-animation-duration: 0.7s;
+	-moz-animation-duration: 0.7s;
+	-webkit-animation-duration: 0.7s;
+	animation-duration: 0.7s;
+
+	-o-animation-timing-function: linear;
+	-moz-animation-timing-function: linear;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+
+	-o-animation-iteration-count: infinite;
+	-moz-animation-iteration-count: infinite;
+	-webkit-animation-iteration-count: infinite;
+	animation-iteration-count: infinite;
+}
+
+@keyframes glyphicon-refresh-animate {
+	from {
+		-webkit-transform: scale(1) rotate(0deg);
+		-ms-transform: scale(1) rotate(0deg);
+		-o-transform: scale(1) rotate(0deg);
+		transform: scale(1) rotate(0deg);
+	}
+	to {
+		-webkit-transform: scale(1) rotate(360deg);
+		-ms-transform: scale(1) rotate(360deg);
+		-o-transform: scale(1) rotate(360deg);
+		transform: scale(1) rotate(360deg);
+	}
 }
