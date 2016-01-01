@@ -6,11 +6,13 @@ use app\components\AclHelper;
 use app\models\User;
 use app\rbac\AuthorRule;
 use Yii;
+use yii\base\ErrorException;
 use yii\base\InvalidParamException;
 use yii\console\Controller;
 use yii\db\Migration;
 use yii\helpers\Console;
 use yii\rbac\ManagerInterface;
+use yii\web\BadRequestHttpException;
 
 /**
  * Первичная установка приложения
@@ -177,6 +179,91 @@ class InitController extends Controller {
 	}
 
 	/**
+	 * Установка ФИАС
+	 * @throws BadRequestHttpException
+	 * @throws ErrorException
+	 * @throws \yii\db\Exception
+	 */
+	public function actionFias() {
+		ini_set('memory_limit', '512M');
+
+		//конфиг скачиваемых файлов
+		$downloadFiles = [
+			[
+				//url файла
+				'url' => 'http://basicdata.ru/data/fias/fias_addrobj_table.sql.bz2',
+				//имя файла
+				'filename' => 'fias_addrobj_table.sql.bz2',
+				//имя распокованного sql-файла
+				'sqlFilename' => 'fias_addrobj_table.sql',
+			],
+			[
+				'url' => 'http://basicdata.ru/data/fias/fias_addrobj_index.sql.bz2',
+				'filename' => 'fias_addrobj_index.sql.bz2',
+				'sqlFilename' => 'fias_addrobj_index.sql',
+			],
+			[
+				'url' => 'http://basicdata.ru/data/fias/fias_addrobj_data.sql.bz2',
+				'filename' => 'fias_addrobj_data.sql.bz2',
+				'sqlFilename' => 'fias_addrobj_data.sql',
+			],
+		];
+
+		$this->stdout('Сейчас будут загружены следующие файлы: ' . PHP_EOL);
+
+		foreach($downloadFiles as $fileRow) {
+			$this->stdout($fileRow['url'] . PHP_EOL, Console::FG_GREEN);
+		}
+
+		$this->stdout('Загрузить их? [Y/n] ');
+
+		$downloadConfirm = mb_strtolower(Console::stdin());
+
+		$this->stdout(PHP_EOL);
+
+		if ($downloadConfirm !== '' && $downloadConfirm !== 'y') {
+			$this->stdout('Завершаем выполнение' . PHP_EOL, Console::FG_RED);
+			return ;
+		}
+
+		$downloadDir = $this->getDownloadDir('fias');
+
+		$this->stdout('Удаляем таблицу, если она есть... ');
+		Yii::$app->db->createCommand('DROP TABLE IF EXISTS `d_fias_addrobj`;')->execute();
+		$this->stdout('готово' . PHP_EOL);
+
+		foreach($downloadFiles as $fileRow) {
+			$this->stdout('Загружаем файл ' . $fileRow['url'] . PHP_EOL);
+
+			$this->stdout('Размер файла: ' . number_format($this->getDownloadFileSize($fileRow['url']), 0, '.', ' ') . ' байт' . PHP_EOL);
+
+			$this->downloadFile($fileRow['url'], $fileRow['filename'], $downloadDir);
+			$this->stdout('готово' . PHP_EOL);
+
+			$this->stdout('Распаковываем файл ' . $fileRow['filename'] . '... ');
+			$this->unpackFile($downloadDir . DIRECTORY_SEPARATOR . $fileRow['filename']);
+			$this->stdout('готово' . PHP_EOL);
+
+			$this->stdout('Загружаем файл в БД... ');
+			$this->loadDb($downloadDir . DIRECTORY_SEPARATOR . $fileRow['sqlFilename']);
+			$this->stdout('готово' . PHP_EOL);
+		}
+
+		$this->stdout('Добавляем нужные индексы...');
+		Yii::$app->db->createCommand('ALTER TABLE `d_fias_addrobj`ADD INDEX `aolevel_actstatus_formalname` (`aolevel`, `actstatus`, `formalname`);')
+			->execute();
+		$this->stdout('готово' . PHP_EOL);
+
+		$this->stdout('Удаляем временный каталог...');
+		exec('rm -rf ' . $downloadDir, $output, $return);
+		if ($return !== 0) {
+			throw new ErrorException('Ошибка при удалении временного каталога');
+		}
+
+		$this->stdout('готово' . PHP_EOL);
+	}
+
+	/**
 	 * Получить объект миграции
 	 *
 	 * @param string $path  Путь к файлу миграции
@@ -200,6 +287,154 @@ class InitController extends Controller {
 		$mirgation = new $class();
 
 		return $mirgation;
+	}
+
+	/**
+	 * Получить размер скачиваемого файла
+	 * @param string $url
+	 * @return int
+	 * @throws BadRequestHttpException
+	 */
+	protected function getDownloadFileSize($url) {
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL,				$url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER,	true);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT,	5);
+		curl_setopt($curl, CURLOPT_TIMEOUT,			30);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION,	false);
+
+		//проверяем размер файла
+		curl_setopt($curl,	CURLOPT_NOBODY, true);
+		curl_setopt($curl,	CURLOPT_HEADER, true);
+
+		$result = curl_exec($curl);
+
+		$errNo = curl_errno($curl);
+
+		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+		curl_close($curl);
+
+		if ($errNo !== 0) {
+			throw new BadRequestHttpException('Ошибка curl: ' . $errNo);
+		}
+
+		if($httpCode !== 200) {
+			throw new BadRequestHttpException('Ошибка при загрузке файла ' . $url . ', http code: ' . $httpCode);
+		}
+
+		if(preg_match('/Content-Length: ([0-9]+)/im',$result, $vals)) {
+			return (int)$vals[1];
+		}
+
+		throw new BadRequestHttpException('Не удалось определить размер файла');
+	}
+
+	/**
+	 * Скачать файл
+	 * @param string $url
+	 * @param string $tmpFilename
+	 * @param string $saveDir
+	 * @return resource
+	 * @throws BadRequestHttpException
+	 */
+	protected function downloadFile($url, $tmpFilename, $saveDir) {
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL,				$url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER,	true);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT,	5);
+		curl_setopt($curl, CURLOPT_TIMEOUT,			600);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION,	false);
+
+		$fp = fopen($saveDir . DIRECTORY_SEPARATOR . $tmpFilename, 'w+');
+
+		curl_setopt($curl, CURLOPT_FILE, $fp);
+
+		curl_exec($curl);
+
+		$errNo = curl_errno($curl);
+
+		curl_close($curl);
+
+		fclose($fp);
+
+		if ($errNo !== 0) {
+			throw new BadRequestHttpException('Ошибка curl: ' . $errNo);
+		}
+
+//		file_put_contents($saveDir . DIRECTORY_SEPARATOR . $tmpFilename, $result);
+
+		return $curl;
+	}
+
+	protected function unpackFile($filepath) {
+		$result = exec('bunzip2 -f ' . $filepath, $output, $return);
+
+		if ($return !== 0) {
+			throw new ErrorException('Ошибка выполнения команды bunzip2', $return);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Загрузка sql-файла в БД
+	 * @param string $filepath
+	 * @return string
+	 * @throws ErrorException
+	 */
+	protected function loadDb($filepath) {
+
+		if (file_exists($filepath) === false) {
+			throw new InvalidParamException('SQL Файл для импорта ' . $filepath . ' не существует');
+		}
+
+		$dbUsername = Yii::$app->db->username;
+		$dbPassword = Yii::$app->db->password;
+		$dbDatabase = null;
+		if (preg_match('/dbname=([0-9a-z_-]*)/i', Yii::$app->db->dsn, $result)) {
+			$dbDatabase = $result[1];
+
+		}
+
+		if (empty($dbUsername)) {
+			throw new ErrorException('Не удалось получить имя пользователя БД');
+		}
+
+		if (empty($dbPassword)) {
+			throw new ErrorException('Не удалось получить пароль пользователя БД');
+		}
+
+		if (empty($dbDatabase)) {
+			throw new ErrorException('Не удалось получить имя БД');
+		}
+
+		$result = exec('mysql -u' . $dbUsername . ' -p' . $dbPassword . ' ' . $dbDatabase . ' < ' . $filepath, $output, $return);
+
+		if ($return !== 0) {
+			throw new ErrorException('Ошибка выполнения команды mysql', $return);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Получить путь к каталогу для загрузки
+	 * @param string $catalog имя каталога
+	 * @return string
+	 * @throws InvalidParamException
+	 */
+	protected function getDownloadDir($catalog) {
+		$path = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $catalog;
+		if (file_exists($path) === false) {
+			if (is_writable(Yii::getAlias('@runtime')) === false) {
+				throw new InvalidParamException('Каталог ' . $path . ' недоступен для записи');
+			}
+
+			mkdir(Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $catalog);
+		}
+
+		return $path;
 	}
 
 }
