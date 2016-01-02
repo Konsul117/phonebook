@@ -18,13 +18,17 @@ use yii\db\ActiveQuery;
  * @property string  $name            Имя
  * @property string  $surname         Фамилия
  * @property string  $phone           Телефон
+ * @property string  $email           E-mail
  * @property string  $city_guid       Guid города по ФИАС
  * @property string  $street_guid     Guid улицы по ФИАС
+ * @property string  $house           Номер дома
+ * @property string  $appartment       Квартира
  * @property integer $create_stamp    Дата-время создания записи
  * @property integer $update_stamp    Дата-время обновления записи
  *
  * @property User        $author
  * @property string      $authorName
+ * @property string      $phoneFront
  *
  * Отношения:
  * @property FiasAddrobj $city          Город
@@ -54,13 +58,14 @@ class Contact extends \yii\db\ActiveRecord {
 			[['name', 'surname'], 'string', 'max' => 100, 'message' => 'Длина не более 100 символов'],
 			[['name', 'phone'], 'required', 'message' => 'Поле не заполнено'],
 			['phone', PhoneValidator::class],
+			['email', 'email'],
 			[['city_guid', 'street_guid'], GuidValidator::class],
 		];
 	}
 
 	public function scenarios() {
 		return [
-			static::SCENARIO_ADD_CONTACT => ['name', 'surname', 'phoneFront', 'city_guid', 'street_guid'],
+			static::SCENARIO_ADD_CONTACT => ['name', 'surname', 'phoneFront', 'email', 'city_guid', 'street_guid', 'house', 'appartment'],
 		];
 	}
 
@@ -75,8 +80,11 @@ class Contact extends \yii\db\ActiveRecord {
 			'surname'      => 'Фамилия',
 			'phone'        => 'Телефон',
 			'phoneFront'   => 'Телефон',
+			'email'        => 'E-mail',
 			'cityTitle'    => 'Город',
 			'streetTitle'  => 'Улица',
+			'house'        => 'Дом',
+			'appartment'    => 'Квартира',
 			'create_stamp' => 'Создано',
 			'update_stamp' => 'Обновлено',
 		];

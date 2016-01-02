@@ -33,8 +33,11 @@ $this->params['breadcrumbs'][] = $this->title;
 						'attribute' => 'phone',
 						'format'    => 'phoneVisual',
 				],
+				'email',
 				'cityTitle',
 				'streetTitle',
+				'house',
+				'appartment',
 				[
 						'class'     => DataColumn::class,
 						'attribute' => 'create_stamp',
@@ -58,8 +61,11 @@ $this->params['breadcrumbs'][] = $this->title;
 						'attribute' => 'phone',
 						'format'    => 'phoneVisual',
 				],
+				'email',
 				'cityTitle',
 				'streetTitle',
+				'house',
+				'appartment',
 				[
 						'class'     => 'yii\grid\DataColumn',
 						'attribute' => 'create_stamp',

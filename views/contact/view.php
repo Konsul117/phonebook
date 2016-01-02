@@ -34,11 +34,8 @@ $this->params['breadcrumbs'][] = $this->title;
 				'authorName',
 				'name',
 				'surname',
-				[
-						'class'     => 'yii\grid\DataColumn',
-						'attribute' => 'phone',
-						'format'    => 'phoneVisual',
-				],
+				'phoneFront',
+				'email',
 				[
 						'attribute' => 'cityTitle',
 						'value'     => (($model->city !== null) ? $model->city->formalname : ''),
@@ -47,6 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
 						'attribute' => 'streetTitle',
 						'value'     => (($model->street !== null) ? $model->street->formalname : ''),
 				],
+				'house',
+				'appartment',
 				[
 						'attribute' => 'create_stamp',
 						'format'    => 'localDate',
@@ -67,6 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
 						'attribute' => 'phone',
 						'format'    => 'phoneVisual',
 				],
+				'email',
 				[
 						'attribute' => 'cityTitle',
 						'value'     => (($model->city !== null) ? $model->city->formalname : ''),
@@ -75,6 +75,8 @@ $this->params['breadcrumbs'][] = $this->title;
 						'attribute' => 'streetTitle',
 						'value'     => (($model->street !== null) ? $model->street->formalname : ''),
 				],
+				'house',
+				'appartment',
 				[
 						'attribute' => 'create_stamp',
 						'format'    => 'localDate',
