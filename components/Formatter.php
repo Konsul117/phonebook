@@ -12,9 +12,33 @@ class Formatter extends \yii\i18n\Formatter {
 	 * @param null $format
 	 * @return string
 	 */
-	public function asLocalDate($value, $format = null) {
+	public function asLocalDateTime($value, $format = null) {
 		if ($format === null) {
 			$format = $this->dateFormat;
+		}
+
+		if ($value === null) {
+			return '';
+		}
+
+		return (new DateTime($value, new DateTimeZone('UTC')))
+			->setTimezone(DateTimeZone::getTimezoneByUtcOffset(10))
+			->format($format);
+	}
+
+	/**
+	 * Вывод даты в локальном формате
+	 * @param      $value
+	 * @param null $format
+	 * @return string
+	 */
+	public function asLocalDate($value, $format = null) {
+		if ($format === null) {
+			$format = 'd.m.Y';
+		}
+
+		if ($value === null) {
+			return '';
 		}
 
 		return (new DateTime($value, new DateTimeZone('UTC')))

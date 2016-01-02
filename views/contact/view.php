@@ -34,6 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'authorName',
 				'name',
 				'surname',
+				'middle_name',
+				[
+						'attribute' => 'birth_date',
+						'format'    => 'localDate',
+				],
 				'phoneFront',
 				'email',
 				[
@@ -48,11 +53,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'appartment',
 				[
 						'attribute' => 'create_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 				[
 						'attribute' => 'update_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 		];
 	}
@@ -61,6 +66,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'id',
 				'name',
 				'surname',
+				'middle_name',
+				[
+						'attribute' => 'birth_date',
+						'format'    => 'localDate',
+				],
 				[
 						'class'     => 'yii\grid\DataColumn',
 						'attribute' => 'phone',
@@ -79,11 +89,11 @@ $this->params['breadcrumbs'][] = $this->title;
 				'appartment',
 				[
 						'attribute' => 'create_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 				[
 						'attribute' => 'update_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 		];
 	} ?>

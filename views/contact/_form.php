@@ -1,6 +1,7 @@
 <?php
 
 use app\models\Contact;
+use app\widgets\BirthDateWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -13,9 +14,18 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(['options' => ['id' => 'contactForm', 'autocomplete' => 'off']]); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => 100])->label('Имя') ?>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => 100]) ?>
 
-    <?= $form->field($model, 'surname')->textInput(['maxlength' => 100])->label('Фамилия') ?>
+    <?= $form->field($model, 'surname')->textInput(['maxlength' => 100]) ?>
+
+    <?= $form->field($model, 'middle_name')->textInput(['maxlength' => 100]) ?>
+
+	<?= BirthDateWidget::widget([
+			'id'    => 'contactBirthDate',
+			'field' => $form->field($model, 'birth_date'),
+	]) ?>
+
+    <?//= $form->field($model, 'birth_date')->textInput(['maxlength' => 100, 'data-role' => 'date-field']) ?>
 
     <?= $form->field($model, 'phoneFront')->textInput(['maxlength' => 45, 'class' => 'form-control', 'data-role' => 'phone-field']) ?>
 

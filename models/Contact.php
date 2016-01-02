@@ -5,6 +5,7 @@ namespace app\models;
 use app\components\PhoneNumberHelper;
 use app\components\TimestampUTCBehavior;
 use app\components\validators\GuidValidator;
+use app\components\validators\NameValidator;
 use app\components\validators\PhoneValidator;
 use Yii;
 use yii\behaviors\BlameableBehavior;
@@ -17,6 +18,8 @@ use yii\db\ActiveQuery;
  * @property integer $author_id       Автор
  * @property string  $name            Имя
  * @property string  $surname         Фамилия
+ * @property string  $middle_name     Отчество
+ * @property string  $birth_date      Дата рождения
  * @property string  $phone           Телефон
  * @property string  $email           E-mail
  * @property string  $city_guid       Guid города по ФИАС
@@ -56,16 +59,32 @@ class Contact extends \yii\db\ActiveRecord {
 		return [
 			[['author_id'], 'integer'],
 			[['name', 'surname'], 'string', 'max' => 100, 'message' => 'Длина не более 100 символов'],
+			[['name', 'surname', 'middle_name'], NameValidator::class, 'message' => 'Некорректное символы'],
 			[['name', 'phone'], 'required', 'message' => 'Поле не заполнено'],
 			['phone', PhoneValidator::class],
 			['email', 'email'],
+//			['birth_date', 'date', 'format' => 'yyyy-mm-dd'],
+			['birth_date', 'validateDate'],
 			[['city_guid', 'street_guid'], GuidValidator::class],
 		];
 	}
 
+	public function validateDate($attribute) {
+		$dateEl = explode('-', $this->$attribute);
+
+		if (count($dateEl) < 3) {
+			$this->addError($attribute, 'Дата не заполнена.');
+			return ;
+		}
+
+		if (checkdate((int) $dateEl[1], (int) $dateEl[2], (int) $dateEl[0]) === false) {
+			$this->addError($attribute, "Указанная дата не является корректной.");
+		}
+	}
+
 	public function scenarios() {
 		return [
-			static::SCENARIO_ADD_CONTACT => ['name', 'surname', 'phoneFront', 'email', 'city_guid', 'street_guid', 'house', 'appartment'],
+			static::SCENARIO_ADD_CONTACT => ['name', 'surname', 'middle_name', 'birth_date', 'phoneFront', 'email', 'city_guid', 'street_guid', 'house', 'appartment'],
 		];
 	}
 
@@ -78,13 +97,15 @@ class Contact extends \yii\db\ActiveRecord {
 			'authorName'   => 'Владелец',
 			'name'         => 'Имя',
 			'surname'      => 'Фамилия',
+			'middle_name'  => 'Отчество',
+			'birth_date'   => 'Дата рождения',
 			'phone'        => 'Телефон',
 			'phoneFront'   => 'Телефон',
 			'email'        => 'E-mail',
 			'cityTitle'    => 'Город',
 			'streetTitle'  => 'Улица',
 			'house'        => 'Дом',
-			'appartment'    => 'Квартира',
+			'appartment'   => 'Квартира',
 			'create_stamp' => 'Создано',
 			'update_stamp' => 'Обновлено',
 		];

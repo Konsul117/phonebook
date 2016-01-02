@@ -1,4 +1,5 @@
 <?php
+
 namespace app\components\validators;
 
 use yii\validators\RegularExpressionValidator;

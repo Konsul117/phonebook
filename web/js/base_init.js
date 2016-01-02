@@ -5,7 +5,7 @@ $(document).ready(function() {
 	$('input[data-role=email-field]').inputmask({
 		mask: "*{1,20}[.*{1,20}][.*{1,20}][.*{1,20}]@*{1,20}[.*{2,6}][.*{1,2}]",
 		greedy: false,
-		onBeforePaste: function (pastedValue, opts) {
+		onBeforePaste: function (pastedValue) {
 			pastedValue = pastedValue.toLowerCase();
 			return pastedValue.replace("mailto:", "");
 		},
@@ -16,6 +16,11 @@ $(document).ready(function() {
 				casing: "lower"
 			}
 		}
+	});
+
+	$('input[data-role=date-field]').datepicker({
+		dateFormat: 'dd.mm.yy',
+		maxDate: new Date()
 	});
 
 });

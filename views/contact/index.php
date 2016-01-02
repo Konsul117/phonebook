@@ -41,12 +41,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				[
 						'class'     => DataColumn::class,
 						'attribute' => 'create_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 				[
 						'class'     => DataColumn::class,
 						'attribute' => 'update_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 				['class' => 'yii\grid\ActionColumn'],
 		];
@@ -69,12 +69,12 @@ $this->params['breadcrumbs'][] = $this->title;
 				[
 						'class'     => 'yii\grid\DataColumn',
 						'attribute' => 'create_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 				[
 						'class'     => 'yii\grid\DataColumn',
 						'attribute' => 'update_stamp',
-						'format'    => 'localDate',
+						'format'    => 'localDateTime',
 				],
 				['class' => 'yii\grid\ActionColumn'],
 		];
