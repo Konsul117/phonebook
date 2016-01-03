@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "install": "~1.0.4",
-    "jquery-ui": "~1.11.4"
+    "jquery-ui": "~1.11.4",
+    "jquery.inputmask": "robinherbots/jquery.inputmask#~3.2.5"
   }
 }
