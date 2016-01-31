@@ -31,10 +31,11 @@ class InitController extends Controller {
 	 * Установка
 	 */
 	public function actionInstall() {
+
 		$this->stdout('Создаём структуру таблц приложения' . PHP_EOL, Console::FG_GREEN);
 
-		foreach ($this->appMigrations as $mItem) {
-			$this->getMigration('@app/migrations/', $mItem)->up();
+		foreach ($this->getAppMigrations() as $item) {
+			$this->getMigration($item['path'], $item['class'])->up();
 		}
 
 		$this->stdout('Создаём структуру таблц ACL' . PHP_EOL, Console::FG_GREEN);
@@ -46,13 +47,42 @@ class InitController extends Controller {
 	}
 
 	/**
+	 * Получение миграций
+	 *
+	 * @return array массив в формате:
+	 *  [
+	 *      [
+	 *          'path' => каталог файла,
+	 *          'class => класс,
+	 *      ]
+	 *  ]
+	 */
+	protected function getAppMigrations() {
+		$migrations = [];
+		foreach(glob(Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR . '*.php') as $filepath) {
+			if (preg_match('/^(.*)\/([a-z0-9_-]*)\.php$/ui', $filepath, $res)) {
+				$migrations[] = [
+					'path'  => $res[1],
+					'class' => $res[2],
+				];
+			}
+		}
+		return $migrations;
+	}
+
+	/**
 	 * Удаление
 	 */
 	public function actionUninstall() {
 		$this->stdout('Удаляем структуру таблц приложения' . PHP_EOL, Console::FG_GREEN);
 
-		foreach ($this->appMigrations as $mItem) {
-			$this->getMigration('@app/migrations/', $mItem)->down();
+		$migrations = $this->getAppMigrations();
+
+		//реверсируем массив миграций, чтобы они выполнялись от последней к первой
+		$migrations = array_reverse($migrations);
+
+		foreach ($migrations as $item) {
+			$this->getMigration($item['path'], $item['class'])->down();
 		}
 
 		$this->stdout('Удаляем структуру таблц ACL' . PHP_EOL, Console::FG_GREEN);
@@ -271,7 +301,7 @@ class InitController extends Controller {
 	 * @return Migration объект миграции
 	 */
 	protected function getMigration($path, $class) {
-		$file = Yii::getAlias($path . $class . '.php');
+		$file = Yii::getAlias($path . DIRECTORY_SEPARATOR . $class . '.php');
 
 		if (file_exists($file) === false) {
 			throw new InvalidParamException('Файл миграцим ' . $file . ' (путь: ' . $path . ') не существует');
